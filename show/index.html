@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width,user-scalable=no">
+    <meta name="author" content="ShaoZeMing,szm19920426@gmail.com beijing">
+
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+    <!--嘿嘿，禁止缩放-->
+    <link rel="apple-touch-icon-precomposed" href="./public/1.png">
+    <meta name="format-detection" content="telephone=no">
+    <title>天气小报</title>
+    <style type="text/css">
+        body {
+            text-align: center;
+            margin: 0px;
+            padding: 0px;
+            font-size: 25px;
+            color: #FFF;
+            font-family: "微软雅黑";
+            background: #235A32;
+        }
+        div {
+            text-align: left;
+        }
+        .tittle {
+            width: 100%;
+            /* background: #235A32; */
+            top: 0px;
+            height: 100%;
+            z-index: 0;
+            position: absolute;
+            position: fixed !important;
+            display: none;
+            cursor: default;
+        }
+
+        .big {
+            font-family: "微软雅黑";
+            color: #FFF;
+            font-size: 35px;
+        }
+        .tishi {
+            position: absolute;
+            position: fixed !important;
+            z-index: 99;
+            bottom: 10px;
+            width: 100%;
+            text-align: center;
+        }
+        .tishiContent {
+            border: 1px solid #FFF;
+            font-size: 18px;
+            padding: 5px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+    </style>
+    
+
+</head>
+
+<body>
+<audio id="audio" src="public/shangfen.mp3" ></audio>
+
+<canvas id='rain' style='position: relative; z-index:-1;'></canvas>
+
+<section style="text-align: center">
+
+    <div class="tittle" id="t-1" style="display: none;">
+        <table width="100%" border="0" height="100%">
+            <tbody>
+            <tr>
+                <td align="center">正在初始化</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="tittle" id="t-2" style="display: block;">
+        <table width="100%" border="0" height="100%">
+            <tbody>
+            <tr>
+                <td align="center" class="big"><span >今天</span>阴雨</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="tittle" id="t-3" style="">
+        <table width="100%" border="0" height="100%">
+            <tbody>
+            <tr>
+                <td align="center">而且还是<span class="big">周一</span></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+   <div class="tittle" id="t-4" style="">
+        <table width="100%" border="0" height="100%">
+            <tbody>
+            <tr>
+                <td align="center">但是快要<span class="big">下班了</span></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+
+    <div class="tittle" id="t-5" style="">
+        <table width="100%" border="0" height="100%">
+            <tbody>
+            <tr>
+                <td align="center"><br>
+                    <span class="big">来伸个懒腰吧</span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- <div class="tittle" id="t-5" style="">
+        <table width="100%" border="0" height="100%">
+            <tbody>
+            <tr>
+                <td align="center"><br>我想你，想你<span class="big">你</span></td>
+            </tr>
+            </tbody>
+        </table>
+    </div> -->
+
+</section>
+
+<!-- <div align="center" class="tishi">
+    <span class="tishiContent">轻触屏幕继续</span>
+</div> -->
+</body>
+</html>
+
+    <script type="text/javascript" src="./jscss/jquery.min.js"></script>
+    <!-- timer控制 -->
+    <script>
+        $(document).ready(function (e) {
+            $(document).scrollTop(300);
+            /*移动滚动条到最下方*/
+            timer = setInterval("$.change()", 5000);
+            t = 2;
+            $("#t-" + t).fadeIn();
+            $(document).click(
+                    function () {
+                        /*如果用户点击了，就取消自动播放*/
+                        clearInterval(timer);
+                        $.change();
+                    }
+            );
+
+            /*切换*/
+            $.change = function () {
+                t++;
+                if (t <= $(".tittle").length) {
+                    $(".tittle").slideUp(1500).fadeOut();
+                    $("#t-" + t).slideDown(1500).fadeIn();
+                } 
+                else {
+                    localStorage["index"] = "1";
+                    window.location = "index4.html";
+                }
+            }
+        });
+    </script>
+    <!-- 雨滴 -->
+    <script type="text/javascript">
+        var canvas = document.getElementById('rain');
+        var ctx = canvas.getContext('2d');
+        const WIDTH = window.innerWidth;
+        const HEIGHT = window.innerHeight;
+        canvas.setAttribute("width", WIDTH);
+        canvas.setAttribute("height", HEIGHT);
+
+
+        var count = window.innerWidth / 100,
+            imgCount = 3;
+            imgList = [],
+            yList = [];
+        
+        for(var x = 0;x < imgCount;x++){
+            ctx.clearRect(0,0,canvas.width,canvas.height);//清除画布
+            for(var i = 0;i<count;i++){
+                var imgX = Math.random() * canvas.width;
+                var imgY = Math.random() * canvas.height;
+                var ColR = Math.floor(Math.random() * 255);
+                var ColG = Math.floor(Math.random() * 255);
+                var ColB = Math.floor(Math.random() * 255);
+                var alpha = Math.random() * 0.2 + 0.8;
+
+                ctx.beginPath();
+                ctx.moveTo(imgX,imgY);//起点
+                ctx.lineTo(imgX + 3,imgY + 15);//绘制线条
+                var radius = 3;//圆形半径
+                ctx.arc(imgX,imgY + 15,radius,0,180* Math.PI / 180);//绘制一个半圆
+                ctx.fillStyle = "rgba(" + ColR + "," + ColG + "," + ColB + "," + alpha + ")";
+                ctx.shadowColor = "rgb(" + ColR + "," + ColG + "," + ColB + ")";
+                ctx.closePath();//闭合路径
+                ctx.fill();//填充
+                var img = new Image();
+                img.src = canvas.toDataURL("image/png");//保存图片
+            }
+            imgList[x] = img;
+            yList[x] = 0;
+        }
+
+
+
+        dropDown();
+        //下落的方法
+        function dropDown(){
+            ctx.clearRect(0,0,canvas.width,canvas.height);//清除画布
+            for(var i = 0;i<imgCount;i++){
+                yList[i] += (i + 1.5) * 5;
+                if (yList[i] > canvas.height) {
+                    yList[i] = yList[i] - canvas.height;
+                }
+                ctx.drawImage(imgList[i], 0, yList[i]);
+                ctx.drawImage(imgList[i], 0, yList[i] - canvas.height);
+            }
+            window.requestAnimationFrame(dropDown);
+        }
+        </script>
+    <!-- 爱心控制 -->
+    <script type="text/javascript">
+        var canvas = document.getElementById("cavs1");
+        const WIDTH = window.innerWidth;
+        const HEIGHT = window.innerHeight;
+        canvas.setAttribute("width", WIDTH);
+        canvas.setAttribute("height", HEIGHT);
+        var context = canvas.getContext("2d");
+        var start =
+        {
+            loves: [],
+            DURATION: 30,
+            begin: function()
+            {
+                this.createLove();
+            },
+            createLove: function()
+            {
+                for (var i = 0; i < WIDTH / 59; i++)
+                {
+                    var love = new Love();
+                    this.loves.push(love);
+                }
+                setInterval(this.drawLove.bind(this), this.DURATION);
+            },
+            drawLove: function()
+            {
+                context.clearRect(0, 0, WIDTH, HEIGHT);
+                for (var key in this.loves)
+                {
+                    this.loves[key].draw();
+                }
+            }
+        }
+        function Love()
+        {
+            var me = this;
+            function rand() 
+            {
+                me.maxScale = (Math.random() * 3.2 + 1.2) * WIDTH / 521;
+                me.curScale = 1.2 * WIDTH / 521;
+                me.x = Math.floor(Math.random() * WIDTH - 40);
+                me.y = Math.floor(HEIGHT - Math.random() * 200);
+                me.ColR = Math.floor(Math.random() * 255);
+                me.ColG = Math.floor(Math.random() * 255);
+                me.ColB = Math.floor(Math.random() * 255);
+                me.alpha = Math.random() * 0.2 + 0.8;
+                me.vector = Math.random() * 5 + 0.4;
+            }
+            (function(){rand();} ());
+            me.draw = function()
+            {
+                if (me.alpha < 0.01) rand();
+                if(me.curScale < me.maxScale) me.curScale += 0.3;
+                x = me.x;
+                y = me.y;
+                scale = me.curScale;
+                context.fillStyle = "rgba(" + me.ColR + "," + me.ColG + "," + me.ColB + "," + me.alpha + ")";
+                context.shadowBlur = 10;
+                context.shadowColor = "rgb(" + me.ColR + "," + me.ColG + "," + me.ColB + ")";
+                context.beginPath();
+                context.bezierCurveTo( x + 2.5*scale, y + 2.5*scale, x + 2.0*scale, y, x, y );
+                context.bezierCurveTo( x - 3.0*scale, y, x - 3.0*scale, y + 3.5*scale,x - 3.0*scale,y + 3.5*scale );
+                context.bezierCurveTo( x - 3.0*scale, y + 5.5*scale, x - 1.0*scale, y + 7.7*scale, x + 2.5*scale, y + 9.5*scale );
+                context.bezierCurveTo( x + 6.0*scale, y + 7.7*scale, x + 8.0*scale, y + 5.5*scale, x + 8.0*scale, y + 3.5*scale );
+                context.bezierCurveTo( x + 8.0*scale, y + 3.5*scale, x + 8.0*scale, y, x + 5.0*scale, y );
+                context.bezierCurveTo( x + 3.5*scale, y, x + 2.5*scale, y + 2.5*scale, x + 2.5*scale, y + 2.5*scale );
+                context.fill();
+                context.closePath();
+                me.y -= me.vector;
+                me.alpha -= (me.vector / 2.9 * 3.5 / HEIGHT);
+            }
+        }
+        window.onload = function()
+        {
+            start.begin();
+        }
+    </script>
